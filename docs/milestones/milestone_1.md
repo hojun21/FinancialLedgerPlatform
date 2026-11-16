@@ -1,98 +1,98 @@
-# Chapter 1. 로그인과 당행이체
+# Milestone 1 — Login and internal transfer
 
-> 목표: 회원가입한 사용자가 계좌를 열고, 다른 사람에게 송금하고, 상대방이 거래내역에서 확인할 수 있다.
-> 동시 요청·중복 요청이 와도 **돈이 1원도 틀리지 않는다.**
+**Status:** In progress (Phase 1, writing MemberService)
 
-## 완료 기준 (plan.md)
-- [ ] 회원가입 → 계좌 개설 → 송금 → 상대방 거래내역 확인이 화면에서 동작
-- [ ] 같은 계좌에 동시 출금 100건을 넣어도 잔고가 정확하고 절대 마이너스가 아님
-- [ ] 전체 원장의 차변 합 = 대변 합
-- [ ] 같은 멱등 키로 두 번 요청하면 한 번만 처리
+Goal: user signs up, opens an account, sends money to another user, and the other user sees it in their transaction history. Money must never be off by 1 won, even with concurrent or duplicate requests.
 
-## 기술 결정
-| 항목 | 결정 | 이유 |
-|---|---|---|
-| 인증 | Spring Security, 세션 | 화면 기반 앱, 학습 순서 |
-| 금액 타입 | `long` (원 단위) | 원화는 소수점 없음. double/float 금지 |
-| 시간 타입 | `Instant` | 타임존 포함 저장 |
-| DB | H2 → Phase 5에서 PostgreSQL | 동시성/락 동작은 실제 DB로 검증해야 함 |
-| 패키지 | 계층별 (`domain`, `repository`, `service`, `controller`, `config`) | |
-| 화면 | Thymeleaf (서버 렌더링) | 세션 로그인과 궁합, 프론트 학습 비용 0 |
+Done when:
 
----
+- [ ] Sign up → open account → transfer → receiver checks history works on screen
+- [ ] 100 concurrent withdrawals on the same account: balance is correct and never negative
+- [ ] Sum of debits = sum of credits across the whole ledger
+- [ ] Same idempotency key sent twice is processed only once
 
-## Phase 1. 기반과 인증
-> 배우는 것: 자동 설정, 빈/DI, Security 필터 체인, JPA 엔티티, 트랜잭션
+Decisions:
 
-- [x] 1-1. Security 자동 설정 체험 (기본 로그인 페이지, JSESSIONID)
-- [x] 1-2. `SecurityFilterChain` 직접 정의 (`/signup` 허용)
-- [x] 1-3. JPA + H2 + Lombok + Auditing, `Member` 엔티티, `BaseTimeEntity`
-- [x] 1-4. `MemberRepository` (쿼리 메서드, `Optional`)
-- [x] 1-5. `PasswordEncoder` 빈 (BCrypt)
-- [ ] 1-6. `MemberService.signup()` (`@Service`, 생성자 주입, `@Transactional`)
-- [ ] 1-7. `SignupController` + 중복 아이디 처리 (`exists` 체크 + DB UNIQUE)
-- [ ] 1-8. `UserDetailsService` 구현 → DB 회원으로 로그인
-- [ ] 1-9. 로그인한 사용자 꺼내기 (`@AuthenticationPrincipal`)
+- Money is `long` (won). No double/float.
+- Time is `Instant` (stored with time zone).
+- H2 for now, switch to PostgreSQL in Phase 5 (locks need a real DB).
+- Packages by layer: domain, repository, service, controller, config.
+- Screens with Thymeleaf (fits session login).
 
-**완료:** 가입한 아이디/비밀번호로 로그인되고, DB에는 BCrypt 해시만 저장되어 있다.
 
-## Phase 2. 계좌
-> 배우는 것: 연관관계(`@ManyToOne`), 지연 로딩, 권한 체크
+## Phase 1 - In progress
 
-- [ ] 2-1. `Account` 엔티티 (계좌번호 UNIQUE, 소유자, 잔고 `long`)
-- [ ] 2-2. 계좌번호 생성 규칙
-- [ ] 2-3. 계좌 개설 API
-- [ ] 2-4. 내 계좌 목록/단건 조회 (남의 계좌는 조회 불가)
+Sign up and log in with members stored in the DB.
 
-**완료:** 로그인한 사용자가 계좌를 열고 자기 계좌만 볼 수 있다.
+- [x] Default Security login page (auto-configuration)
+- [x] Custom `SecurityFilterChain` (`/signup`, `/error` open)
+- [x] JPA + H2 + Lombok, `BaseTimeEntity` with auditing, `Member` entity
+- [x] `MemberRepository` with `findByUsername`
+- [x] BCrypt `PasswordEncoder` bean
+- [ ] `MemberService.signup()`. Reject duplicate username, hash password before saving.
+- [ ] `SignupController` for `/signup`. Show a proper error on duplicate username. (`existsByUsername` is only for the message, the real guard is the DB UNIQUE constraint)
+- [ ] `UserDetailsService` so login checks our `members` table instead of the in-memory user.
+- [ ] Get the logged-in user in a controller (`@AuthenticationPrincipal`).
 
-## Phase 3. 원장과 복식부기
-> 배우는 것: 불변 엔티티, 분개 설계, 집계 쿼리(JPQL)
+Check: log in with a signed-up account. DB only has the BCrypt hash, never the raw password.
 
-- [ ] 3-1. 원장 설계: `JournalEntry`(분개) 1 : N `LedgerLine`(차변/대변 라인)
-- [ ] 3-2. 원장 불변 보장 (setter 없음, `updatable = false`, 삭제 API 없음)
-- [ ] 3-3. 시스템 계정 (외부 자금용 상대 계정)
-- [ ] 3-4. 테스트용 입금: 분개 기록 + 잔고 반영을 한 트랜잭션으로
-- [ ] 3-5. 분개 생성 시 차변 합 = 대변 합 검증
-- [ ] 3-6. 전체 원장 차변 합 = 대변 합 검증 쿼리
 
-**완료:** 입금하면 잔고와 원장이 같이 바뀌고, 원장 합계가 항상 맞는다.
+## Phase 2 - Not started
 
-## Phase 4. 당행이체
-> 배우는 것: 트랜잭션 롤백, 입력 검증(Bean Validation), 공통 예외 처리
+Accounts.
 
-- [ ] 4-1. `TransferService`: 출금 + 입금 + 분개를 하나의 트랜잭션으로
-- [ ] 4-2. 잔고 부족 / 같은 계좌 / 0원 이하 → 예외, 롤백 확인
-- [ ] 4-3. 이체 API + 요청 DTO 검증 (`@Valid`)
-- [ ] 4-4. `@RestControllerAdvice`로 예외 → 응답 변환 통일
+- [ ] `Account` entity. Account number (UNIQUE), owner (`@ManyToOne` Member), balance `long`.
+- [ ] Decide account number format.
+- [ ] API to open an account.
+- [ ] List my accounts / view one. Can't see other users' accounts.
 
-**완료:** 이체가 성공하면 양쪽 잔고와 원장이 맞고, 실패하면 아무것도 바뀌지 않는다.
 
-## Phase 5. 동시성
-> 배우는 것: 경쟁 조건(race condition), 비관적/낙관적 락, 데드락
+## Phase 3 - Not started
 
-- [ ] 5-1. PostgreSQL 전환 (Docker)
-- [ ] 5-2. 동시 출금 100건 테스트 작성 → **락 없이 깨지는 것부터 확인**
-- [ ] 5-3. 비관적 락 (`@Lock(PESSIMISTIC_WRITE)`, `SELECT ... FOR UPDATE`) → 테스트 통과
-- [ ] 5-4. 락 순서: 두 계좌는 ID 작은 쪽부터 → A→B, B→A 교차 이체 데드락 테스트
-- [ ] 5-5. (선택) 낙관적 락 `@Version`과 비교
+Ledger with double-entry bookkeeping. Ledger rows are never updated or deleted, mistakes are fixed with a reversing entry.
 
-**완료:** 동시 출금 100건 후 잔고 정확, 마이너스 없음, 데드락 없음.
+- [ ] `JournalEntry` 1 : N `LedgerLine` (debit / credit lines).
+- [ ] Make ledger immutable. No setters, `updatable = false`, no delete API.
+- [ ] System account as the other side for outside money.
+- [ ] Test deposit. Journal entry + balance update in one transaction.
+- [ ] Check debit sum = credit sum when creating an entry.
+- [ ] Query that checks debit sum = credit sum for the whole ledger.
 
-## Phase 6. 멱등성
-> 배우는 것: 멱등 키, DB UNIQUE로 중복 차단, 재시도 안전성
 
-- [ ] 6-1. `Idempotency-Key` 헤더 + 멱등 키 테이블 (UNIQUE)
-- [ ] 6-2. 같은 키 재요청 → 처리하지 않고 이전 결과 반환
-- [ ] 6-3. 같은 키 동시 요청 테스트
+## Phase 4 - Not started
 
-**완료:** 같은 멱등 키로 몇 번을 보내도 이체는 한 번만 일어난다.
+Internal transfer.
 
-## Phase 7. 거래내역과 화면
-> 배우는 것: 페이징(`Pageable`), Thymeleaf, 폼 + CSRF
+- [ ] `TransferService`. Withdraw + deposit + journal entry in one transaction.
+- [ ] Throw on insufficient balance, same account, amount <= 0. Check everything rolls back.
+- [ ] Transfer API with request DTO validation (`@Valid`).
+- [ ] `@RestControllerAdvice` to turn exceptions into consistent error responses.
 
-- [ ] 7-1. 거래내역 조회 API (페이징, 본인 계좌만)
-- [ ] 7-2. 화면: 회원가입, 로그인, 계좌 목록, 이체, 거래내역
-- [ ] 7-3. 전체 흐름 확인: 가입 → 개설 → 송금 → 상대방 거래내역
 
-**완료:** Chapter 1 완료 기준 4개 모두 체크.
+## Phase 5 - Not started
+
+Concurrency. No `synchronized`, only DB locks.
+
+- [ ] Switch to PostgreSQL (Docker).
+- [ ] Test with 100 concurrent withdrawals. Run it without locks first and watch it break.
+- [ ] Pessimistic lock (`@Lock(PESSIMISTIC_WRITE)`, `SELECT ... FOR UPDATE`). Test should pass.
+- [ ] Lock order: smaller account ID first. Test A→B and B→A at the same time, no deadlock.
+- [ ] (Optional) Compare with optimistic lock `@Version`.
+
+
+## Phase 6 - Not started
+
+Idempotency.
+
+- [ ] `Idempotency-Key` header + idempotency key table with UNIQUE.
+- [ ] Same key again: don't process, return the previous result.
+- [ ] Test the same key sent concurrently.
+
+
+## Phase 7 - Not started
+
+Transaction history and screens.
+
+- [ ] History API with paging (`Pageable`), my accounts only.
+- [ ] Screens: sign up, login, account list, transfer, history.
+- [ ] Run the whole flow: sign up → open account → transfer → receiver checks history.
