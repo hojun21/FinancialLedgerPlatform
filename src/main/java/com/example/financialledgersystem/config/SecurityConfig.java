@@ -19,7 +19,8 @@ public class SecurityConfig {
                 auth ->
                         auth.requestMatchers("/signup", "/error").permitAll()
                                 .anyRequest().authenticated()
-        ).formLogin(Customizer.withDefaults());
+        ).formLogin(Customizer.withDefaults())
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/signup"));
 
         // build SecurityFilterChain object and return
         return http.build();
