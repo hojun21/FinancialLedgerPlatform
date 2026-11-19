@@ -29,10 +29,10 @@ Sign up and log in with members stored in the DB.
 - [x] JPA + H2 + Lombok, `BaseTimeEntity` with auditing, `Member` entity
 - [x] `MemberRepository` with `findByUsername`
 - [x] BCrypt `PasswordEncoder` bean
-- [ ] `MemberService.signup()`. Reject duplicate username, hash password before saving.
-- [ ] `SignupController` for `/signup`. Show a proper error on duplicate username. (`existsByUsername` is only for the message, the real guard is the DB UNIQUE constraint)
-- [ ] `UserDetailsService` so login checks our `members` table instead of the in-memory user.
-- [ ] Get the logged-in user in a controller (`@AuthenticationPrincipal`).
+- [x] `MemberService.signup()`. Reject duplicate username, hash password before saving.
+- [x] `SignupController` for `/signup`. Show a proper error on duplicate username. (`existsByUsername` is only for the message, the real guard is the DB UNIQUE constraint)
+- [x] `UserDetailsService` so login checks our `members` table instead of the in-memory user.
+- [x] Get the logged-in user in a controller (`@AuthenticationPrincipal`).
 
 Check: log in with a signed-up account. DB only has the BCrypt hash, never the raw password.
 
