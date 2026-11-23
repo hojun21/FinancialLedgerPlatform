@@ -29,5 +29,6 @@ public class JournalEntry {
 
     public void addLine(Account account, Direction direction, long amount){
         lines.add(new LedgerLine(this, account, direction, amount));
+        account.apply(direction, amount);
     }
 }

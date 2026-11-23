@@ -50,5 +50,8 @@ public class Account extends BaseTimeEntity{
         return owner == null;
     }
 
+    void apply(Direction direction, long amount){
+        balance += (direction == Direction.CREDIT) ? amount : -amount;
+    }
 
 }

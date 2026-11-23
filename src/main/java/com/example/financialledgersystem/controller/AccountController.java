@@ -1,16 +1,16 @@
 package com.example.financialledgersystem.controller;
 
+import com.example.financialledgersystem.domain.LedgerLine;
 import com.example.financialledgersystem.dto.AccountResponse;
+import com.example.financialledgersystem.dto.DepositRequest;
 import com.example.financialledgersystem.service.AccountService;
+import com.example.financialledgersystem.service.LedgerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +20,7 @@ import java.util.Optional;
 public class AccountController {
 
     private final AccountService accountService;
+    private final LedgerService ledgerService;
 
     /*
     Open new account using given user information
@@ -50,4 +51,13 @@ public class AccountController {
         return ResponseEntity.of(accountService.findMine(user.getUsername(), accountNumber));
     }
 
+    @PostMapping("/accounts/{accountNumber}/deposit")
+    public AccountResponse deposit(
+            @AuthenticationPrincipal UserDetails user,
+            @PathVariable String accountNumber,
+            @RequestBody DepositRequest request
+            ){
+
+        return ledgerService.deposit(user.getUsername(), accountNumber, request.amount());
+    }
 }
