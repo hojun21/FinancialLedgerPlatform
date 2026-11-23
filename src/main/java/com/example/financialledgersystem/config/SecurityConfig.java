@@ -19,9 +19,9 @@ public class SecurityConfig {
                 auth ->
                         auth.requestMatchers("/signup", "/error", "/h2-console/**").permitAll()
                                 .anyRequest().authenticated()
-        ).formLogin(Customizer.withDefaults())
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/signup",  "/h2-console/**"))
-                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+                ).formLogin(Customizer.withDefaults())
+                .httpBasic(Customizer.withDefaults())
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/signup", "/h2-console/**", "/accounts/**"));
 
         // build SecurityFilterChain object and return
         return http.build();

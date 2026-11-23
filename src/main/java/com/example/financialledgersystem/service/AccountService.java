@@ -18,12 +18,12 @@ public class AccountService {
     private final MemberRepository memberRepository;
 
 
-    @Transactional
-    public String open(String username){
-        /*
+    /*
         @param username : username of Member who opens new account
         @returns accountNumber of new Account
-         */
+    */
+    @Transactional
+    public String open(String username) {
 
         // Find member
         Member member = memberRepository.findByUsername(username).orElseThrow(
