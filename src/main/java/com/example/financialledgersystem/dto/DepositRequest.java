@@ -1,4 +1,7 @@
 package com.example.financialledgersystem.dto;
 
-public record DepositRequest(long amount) {
+import jakarta.validation.constraints.Positive;
+
+public record DepositRequest(
+        @Positive long amount) {
 }

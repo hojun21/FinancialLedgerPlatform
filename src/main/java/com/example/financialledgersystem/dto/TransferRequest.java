@@ -1,4 +1,9 @@
 package com.example.financialledgersystem.dto;
 
-public record TransferRequest(String toAccountNumber, long amount) {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+
+public record TransferRequest(
+        @NotBlank String toAccountNumber,
+        @Positive long amount) {
 }

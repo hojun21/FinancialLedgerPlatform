@@ -3,8 +3,10 @@ package com.example.financialledgersystem.controller;
 import com.example.financialledgersystem.domain.LedgerLine;
 import com.example.financialledgersystem.dto.AccountResponse;
 import com.example.financialledgersystem.dto.DepositRequest;
+import com.example.financialledgersystem.dto.TransferRequest;
 import com.example.financialledgersystem.service.AccountService;
 import com.example.financialledgersystem.service.LedgerService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,9 +57,16 @@ public class AccountController {
     public AccountResponse deposit(
             @AuthenticationPrincipal UserDetails user,
             @PathVariable String accountNumber,
-            @RequestBody DepositRequest request
+            @Valid @RequestBody DepositRequest request
             ){
 
         return ledgerService.deposit(user.getUsername(), accountNumber, request.amount());
+    }
+
+    @PostMapping("/accounts/{accountNumber}/transfer")
+    public AccountResponse transfer(@AuthenticationPrincipal UserDetails user,
+                                    @PathVariable String accountNumber,
+                                    @Valid @RequestBody TransferRequest request){
+        return ledgerService.transfer(user.getUsername(), accountNumber, request.toAccountNumber(), request.amount());
     }
 }
