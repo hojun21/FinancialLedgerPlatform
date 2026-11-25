@@ -17,12 +17,11 @@ public class SecurityConfig {
         // allow accessing /signup and /error without authentication
         http.authorizeHttpRequests(
                 auth ->
-                        auth.requestMatchers("/signup", "/error", "/h2-console/**").permitAll()
+                        auth.requestMatchers("/signup", "/error").permitAll()
                                 .anyRequest().authenticated()
                 ).formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/signup", "/h2-console/**", "/accounts/**"))
-                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/signup", "/accounts/**"));
 
         // build SecurityFilterChain object and return
         return http.build();
