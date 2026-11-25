@@ -33,9 +33,36 @@ public class LedgerService {
         // Initialize new JournalEntry & LedgerLine
         JournalEntry entry = new JournalEntry("deposit");
         entry.addLine(account, Direction.CREDIT, amount);
-        entry.addLine(account, Direction.DEBIT, amount);
+        entry.addLine(system, Direction.DEBIT, amount);
         journalEntryRepository.save(entry);
         return AccountResponse.from(account);
+    }
+
+    @Transactional
+    public AccountResponse transfer(String fromUsername, String fromNumber, String toNumber, long amount){
+
+        if(amount<=0){
+            throw new IllegalArgumentException("Invalid amount");
+        }
+
+        // to Account and from Account must be different
+        if(fromNumber.equals(toNumber)){
+            throw new IllegalArgumentException("Can't transfer to myself");
+        }
+
+        // Get From account
+        Account from = accountRepository.findByAccountNumberAndOwnerUsername(fromNumber, fromUsername).
+                orElseThrow(() -> new IllegalArgumentException("invalid argument"));
+
+        // Get To account (To account cannot be system account)
+        Account to = accountRepository.findByAccountNumber(toNumber).filter(a -> !a.isSystem())
+                .orElseThrow(() -> new IllegalArgumentException("invalid argument"));
+
+        JournalEntry transfer = new JournalEntry("transfer");
+        transfer.addLine(from, Direction.DEBIT, amount);
+        transfer.addLine(to, Direction.CREDIT, amount);
+        journalEntryRepository.save(transfer);
+        return AccountResponse.from(from);
     }
 
 }

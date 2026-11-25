@@ -51,6 +51,16 @@ public class Account extends BaseTimeEntity{
     }
 
     void apply(Direction direction, long amount){
+        /*
+        Transfer should be declined if all condition holds
+        1. Not system account &
+        2. amount > balance
+        3. Debit
+         */
+        if(!isSystem() && direction == Direction.DEBIT && amount > balance){
+            throw new IllegalStateException("insufficient balance.");
+        }
+
         balance += (direction == Direction.CREDIT) ? amount : -amount;
     }
 
