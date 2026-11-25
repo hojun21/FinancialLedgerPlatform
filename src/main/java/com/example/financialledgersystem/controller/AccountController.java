@@ -4,6 +4,7 @@ import com.example.financialledgersystem.domain.LedgerLine;
 import com.example.financialledgersystem.dto.AccountResponse;
 import com.example.financialledgersystem.dto.DepositRequest;
 import com.example.financialledgersystem.dto.TransferRequest;
+import com.example.financialledgersystem.dto.TrialBalanceResponse;
 import com.example.financialledgersystem.service.AccountService;
 import com.example.financialledgersystem.service.LedgerService;
 import jakarta.validation.Valid;
@@ -68,5 +69,10 @@ public class AccountController {
                                     @PathVariable String accountNumber,
                                     @Valid @RequestBody TransferRequest request){
         return ledgerService.transfer(user.getUsername(), accountNumber, request.toAccountNumber(), request.amount());
+    }
+
+    @GetMapping("/ledger/trial-balance")
+    public TrialBalanceResponse trialBalance(){
+        return ledgerService.trialBalance();
     }
 }

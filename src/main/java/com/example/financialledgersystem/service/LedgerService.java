@@ -4,10 +4,12 @@ import com.example.financialledgersystem.domain.Account;
 import com.example.financialledgersystem.domain.Direction;
 import com.example.financialledgersystem.domain.JournalEntry;
 import com.example.financialledgersystem.dto.AccountResponse;
+import com.example.financialledgersystem.dto.TrialBalanceResponse;
 import com.example.financialledgersystem.repository.AccountRepository;
 import com.example.financialledgersystem.repository.JournalEntryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -63,6 +65,14 @@ public class LedgerService {
         transfer.addLine(to, Direction.CREDIT, amount);
         journalEntryRepository.save(transfer);
         return AccountResponse.from(from);
+    }
+    // This requires two queries to be executed so put REPEATABLE_READ
+    @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
+    public TrialBalanceResponse trialBalance() {
+        long debit =journalEntryRepository.sumByDirection(Direction.DEBIT);
+        long credit = journalEntryRepository.sumByDirection(Direction.CREDIT);
+
+        return TrialBalanceResponse.of(credit, debit);
     }
 
 }

@@ -31,4 +31,21 @@ public class JournalEntry {
         lines.add(new LedgerLine(this, account, direction, amount));
         account.apply(direction, amount);
     }
+
+    // @PrePersist : Check if credit and debit amount is equal before persist
+    @PrePersist
+    void assert_cr_eq_db(){
+
+        if(lines.isEmpty()){
+            throw new RuntimeException("Invalid JournalEntry");
+        }
+        long debit = lines.stream().filter(l -> l.getDirection() == Direction.DEBIT)
+                .mapToLong(LedgerLine::getAmount).sum();
+        long credit = lines.stream().filter(l -> l.getDirection() == Direction.CREDIT)
+                .mapToLong(LedgerLine::getAmount).sum();
+
+        if(debit != credit){
+            throw new RuntimeException("Invalid credit and debit amount");
+        }
+    }
 }

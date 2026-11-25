@@ -41,32 +41,32 @@ Check: log in with a signed-up account. DB only has the BCrypt hash, never the r
 
 Accounts.
 
-- [ ] `Account` entity. Account number (UNIQUE), owner (`@ManyToOne` Member), balance `long`.
-- [ ] Decide account number format.
-- [ ] API to open an account.
-- [ ] List my accounts / view one. Can't see other users' accounts.
+- [x] `Account` entity. Account number (UNIQUE), owner (`@ManyToOne` Member), balance `long`.
+- [x] Decide account number format.
+- [x] API to open an account.
+- [x] List my accounts / view one. Can't see other users' accounts.
 
 
 ## Phase 3 - Not started
 
 Ledger with double-entry bookkeeping. Ledger rows are never updated or deleted, mistakes are fixed with a reversing entry.
 
-- [ ] `JournalEntry` 1 : N `LedgerLine` (debit / credit lines).
-- [ ] Make ledger immutable. No setters, `updatable = false`, no delete API.
-- [ ] System account as the other side for outside money.
-- [ ] Test deposit. Journal entry + balance update in one transaction.
-- [ ] Check debit sum = credit sum when creating an entry.
-- [ ] Query that checks debit sum = credit sum for the whole ledger.
+- [x] `JournalEntry` 1 : N `LedgerLine` (debit / credit lines).
+- [x] Make ledger immutable. No setters, `updatable = false`, no delete API.
+- [x] System account as the other side for outside money.
+- [x] Test deposit. Journal entry + balance update in one transaction.
+- [x] Check debit sum = credit sum when creating an entry.
+- [x] Query that checks debit sum = credit sum for the whole ledger.
 
 
 ## Phase 4 - Not started
 
 Internal transfer.
 
-- [ ] `TransferService`. Withdraw + deposit + journal entry in one transaction.
-- [ ] Throw on insufficient balance, same account, amount <= 0. Check everything rolls back.
-- [ ] Transfer API with request DTO validation (`@Valid`).
-- [ ] `@RestControllerAdvice` to turn exceptions into consistent error responses.
+- [x] `TransferService`. Withdraw + deposit + journal entry in one transaction.
+- [x] Throw on insufficient balance, same account, amount <= 0. Check everything rolls back.
+- [x] Transfer API with request DTO validation (`@Valid`).
+- [x] `@RestControllerAdvice` to turn exceptions into consistent error responses.
 
 
 ## Phase 5 - Not started
