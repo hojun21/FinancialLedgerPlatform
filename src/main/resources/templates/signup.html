@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign up · ZeroSum</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<main class="narrow">
+    <h1>Sign up</h1>
+
+    <!-- TODO practice 1: show an error message (e.g. duplicate username) -->
+    <p class="msg error" th:if="${error}" th:text="${error}"></p>
+
+    <!-- TODO practice 1: make this form POST to /web/signup (th:action + method) -->
+    <form th:action="@{/web/signup}" method="post" class="card">
+        <label>Username <input name="username" required></label>
+        <label>Password <input name="password" type="password" required></label>
+        <button type="submit">Sign up</button>
+    </form>
+
+    <p>Already have an account? <a th:href="@{/web/login}">Log in</a></p>
+</main>
+</body>
+</html>

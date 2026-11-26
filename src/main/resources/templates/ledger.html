@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Trial balance · ZeroSum</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main>
+    <h1>Trial balance</h1>
+    <p class="muted">Sum of all debit lines vs. all credit lines in the ledger. Difference must always be 0.</p>
+
+    <!-- Model: tb (TrialBalanceResponse) -->
+    <div class="grid three">
+        <section class="card"><div class="muted">Debit</div>
+            <div class="balance" th:text="${#numbers.formatInteger(tb.debit, 1, 'COMMA')}">0</div></section>
+        <section class="card"><div class="muted">Credit</div>
+            <div class="balance" th:text="${#numbers.formatInteger(tb.credit, 1, 'COMMA')}">0</div></section>
+        <section class="card"><div class="muted">Difference</div>
+            <div class="balance" th:text="${#numbers.formatInteger(tb.difference, 1, 'COMMA')}">0</div></section>
+    </div>
+
+    <p class="msg ok" th:if="${tb.difference == 0}">Balanced. Debits equal credits.</p>
+    <p class="msg error" th:unless="${tb.difference == 0}">NOT balanced. The ledger is broken.</p>
+</main>
+</body>
+</html>

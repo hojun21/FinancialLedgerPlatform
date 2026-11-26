@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My accounts · ZeroSum</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main>
+    <div class="row">
+        <h1>My accounts</h1>
+        <form th:action="@{/web/accounts}" method="post" class="inline">
+            <button type="submit">+ Open account</button>
+        </form>
+    </div>
+
+    <p class="msg ok" th:if="${msg}" th:text="${msg}"></p>
+
+    <table class="card">
+        <thead>
+        <tr><th>Account number</th><th class="num">Balance</th><th>Opened</th><th></th></tr>
+        </thead>
+        <tbody>
+        <!-- Show account list -->
+        <tr th:each="a : ${accounts}">
+            <td th:text="${a.accountNumber}">1000-0000-0001</td>
+            <td class="num" th:text="${#numbers.formatInteger(a.balance, 1, 'COMMA')}">0</td>
+            <td th:text="${a.createdAt}">2026-11-25</td>
+            <td><a th:href="@{/web/accounts/{n}(n=${a.accountNumber})}">Open</a></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(accounts)}">
+            <td colspan="4" class="muted">No accounts yet.</td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+</body>
+</html>

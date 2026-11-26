@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Account · ZeroSum</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header th:replace="~{fragments :: nav}"></header>
+<main>
+    <p><a th:href="@{/web/accounts}">← My accounts</a></p>
+
+    <!-- Model: account (AccountResponse), msg / error (flash) -->
+    <section class="card">
+        <div class="muted">Account</div>
+        <h1 th:text="${account.accountNumber}">1000-0000-0001</h1>
+        <div class="balance" th:text="${#numbers.formatInteger(account.balance, 1, 'COMMA')}">0</div>
+    </section>
+
+    <p class="msg ok" th:if="${msg}" th:text="${msg}"></p>
+    <p class="msg error" th:if="${error}" th:text="${error}"></p>
+
+    <div class="grid">
+        <form th:action="@{/web/accounts/{n}/deposit(n=${account.accountNumber})}" method="post" class="card">
+            <h2>Deposit</h2>
+            <label>Amount <input name="amount" type="number" min="1" required></label>
+            <button type="submit">Deposit</button>
+        </form>
+
+        <form th:action="@{/web/accounts/{n}/transfer(n=${account.accountNumber})}" method="post" class="card">
+            <h2>Transfer</h2>
+            <label>To account <input name="toAccountNumber" required></label>
+            <label>Amount <input name="amount" type="number" min="1" required></label>
+            <button type="submit">Transfer</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>

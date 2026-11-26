@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Shared top bar. Pages include it with: <header th:replace="~{fragments :: nav}"></header> -->
+<header th:fragment="nav" class="nav">
+    <a class="brand" th:href="@{/web/accounts}">ZeroSum</a>
+    <a th:href="@{/web/accounts}">My accounts</a>
+    <a th:href="@{/web/ledger}">Trial balance</a>
+    <!-- Logout must be a POST with a CSRF token. th:action adds the token for us. -->
+    <form th:action="@{/logout}" method="post" class="inline">
+        <button type="submit" class="link">Log out</button>
+    </form>
+</header>
+
+</body>
+</html>

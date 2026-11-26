@@ -17,9 +17,12 @@ public class SecurityConfig {
         // allow accessing /signup and /error without authentication
         http.authorizeHttpRequests(
                 auth ->
-                        auth.requestMatchers("/signup", "/error").permitAll()
+                        auth.requestMatchers("/signup", "/error", "/web/signup").permitAll()
                                 .anyRequest().authenticated()
-                ).formLogin(Customizer.withDefaults())
+                ).formLogin(form -> form
+                        .loginPage("/web/login").permitAll()
+                        .defaultSuccessUrl("/web/accounts", true))
+                .logout(logout -> logout.logoutSuccessUrl("/web/login?logout"))
                 .httpBasic(Customizer.withDefaults())
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/signup", "/accounts/**"));
 
